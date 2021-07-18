@@ -6,10 +6,8 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.RequestBody
-import okhttp3.ResponseBody
+import okhttp3.*
+import okhttp3.Headers.Companion.headersOf
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -56,26 +54,36 @@ class MainActivity() : AppCompatActivity() {
 
         val requestBody: RequestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart("body","dsdsdsdsddsdds")
+            .addFormDataPart("a","add_entry")
+            .addFormDataPart("session","1")
+            .addFormDataPart("body","asdsadasdsadasdasdsad")
             .build()
 
-        var datum = Datum()
-        datum.body = "efefefefefef"
 
         val apiService = retrofit.create(ApiService::class.java)
         apiService.postMessage(
-            datum
+            requestBody
         )
-            .enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    Log.d("TAG1", "onResponse: ${response}")
+            .enqueue(object : Callback<Datum> {
+                override fun onResponse(call: Call<Datum>, response: Response<Datum>) {
+                    Log.d("TAG1", "onResponse: ${response.body()}")
                 }
 
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                override fun onFailure(call: Call<Datum>, t: Throwable) {
                     Log.d("TAG1", "onFailure: $t")
                 }
 
             })
+
+//        apiService.getMessage().enqueue(object: Callback<Datum>{
+//            override fun onResponse(call: Call<Datum>, response: Response<Datum>) {
+//                Log.d("TAG1", "onResponse: $response")
+//            }
+//
+//            override fun onFailure(call: Call<Datum>, t: Throwable) {
+//                Log.d("TAG1", "onFailure: $t")
+//            }
+//        })
     }
 
 
@@ -132,13 +140,13 @@ class MainActivity() : AppCompatActivity() {
 
 
         val builder = OkHttpClient.Builder()
-        builder.hostnameVerifier(HostnameVerifier { _, _ -> true })
-        builder.addInterceptor { chain ->
-            val newRequest = chain.request().newBuilder()
-                .addHeader("token", "VfQKOIY-Wh-aR2ltnl")
-                .build()
-            chain.proceed(newRequest)
-        }
+//        builder.hostnameVerifier(HostnameVerifier { _, _ -> true })
+//        builder.addInterceptor { chain ->
+//            val newRequest = chain.request().newBuilder()
+//                .addHeader("token", "VfQKOIY-Wh-aR2ltnl")
+//                .build()
+//            chain.proceed(newRequest)
+//        }
         builder.build()
 
 
@@ -156,13 +164,13 @@ class MainActivity() : AppCompatActivity() {
                 .addFormDataPart("a", "new_session")
                 .build()
         )
-            .enqueue(object : Callback<Datum> {
-                override fun onResponse(call: Call<Datum>, response: Response<Datum>) {
-                    Log.d("TAG1", "onResponse: ${response}")
+            .enqueue(object : Callback<Example> {
+                override fun onResponse(call: Call<Example>, response: Response<Example>) {
+                    Log.d("TAG2", "onResponse: ${response.body()?.data?.session}")
                 }
 
-                override fun onFailure(call: Call<Datum>, t: Throwable) {
-                    Log.d("TAG1", "onFailure: $t")
+                override fun onFailure(call: Call<Example>, t: Throwable) {
+                    Log.d("TAG2", "onFailure: $t")
                 }
 
             })
