@@ -1,13 +1,14 @@
 package com.example.myapplication
 
+
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.GsonBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,17 +22,61 @@ import javax.security.cert.CertificateException
 
 
 class MainActivity() : AppCompatActivity() {
+
+   lateinit var retrofit: Retrofit
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        var bottomNavigationView = findViewById<View>(R.id.bottom_navigation_bar) as BottomNavigationView
+        bottomNavigationView.setOnItemSelectedListener{
+            when (it.itemId) {
+                R.id.action_recents -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.frame_layout,ConclusionFragment()).commit()
+                    return@setOnItemSelectedListener true
+                }
+                R.id.action_favorites -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.frame_layout,ConclusionFragment()).commit()
+                    return@setOnItemSelectedListener true
+                }
+                R.id.action_nearby -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.frame_layout,ConclusionFragment()).commit()
+                    return@setOnItemSelectedListener true
+                }
+            }
+            false
+        }
 
         initRetorfit()
+        initPostMessage()
     }
+
+    private fun initPostMessage() {
+
+        val requestBody: RequestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("body","dsdsdsdsddsdds")
+            .build()
+
+        val apiService = retrofit.create(ApiService::class.java)
+        apiService.postMessage(
+            requestBody
+        )
+            .enqueue(object : Callback<Datum> {
+                override fun onResponse(call: Call<Datum>, response: Response<Datum>) {
+                    Log.d("TAG1", "onResponse: ${response.body()}")
+                }
+
+                override fun onFailure(call: Call<Datum>, t: Throwable) {
+                    Log.d("TAG1", "onFailure: $t")
+                }
+
+            })
+    }
+
 
     private fun getUnsafeOkHttpClient(): OkHttpClient? {
         return try {
-            // Create a trust manager that does not validate certificate chains
             val trustAllCerts = arrayOf<TrustManager>(
                 object : X509TrustManager {
                     @Throws(CertificateException::class)
@@ -54,10 +99,8 @@ class MainActivity() : AppCompatActivity() {
                 }
             )
 
-            // Install the all-trusting trust manager
             val sslContext = SSLContext.getInstance("SSL")
             sslContext.init(null, trustAllCerts, SecureRandom())
-            // Create an ssl socket factory with our all-trusting manager
             val sslSocketFactory = sslContext.socketFactory
             val trustManagerFactory: TrustManagerFactory =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
@@ -84,32 +127,43 @@ class MainActivity() : AppCompatActivity() {
     private fun initRetorfit() {
 
 
-        // Создаём объект, при помощи которого будем выполнять запросы
-
-
-
-            val gson = GsonBuilder()
-                .setLenient()
-                .create()
-
-            val retrofit: Retrofit = Retrofit.Builder() // Базовая часть адреса
-                .baseUrl("https://bnet.i-partner.ru/testAPI/") // Конвертер, необходимый для преобразования JSON в объекты
-                .client(getUnsafeOkHttpClient())
-                .addConverterFactory(GsonConverterFactory.create(gson))
+        val builder = OkHttpClient.Builder()
+        builder.hostnameVerifier(HostnameVerifier { _, _ -> true })
+        builder.addInterceptor { chain ->
+            val newRequest = chain.request().newBuilder()
+                .addHeader("token", "VfQKOIY-Wh-aR2ltnl")
                 .build()
+            chain.proceed(newRequest)
+        }
+        builder.build()
 
-            var apiService = retrofit.create(ApiService::class.java)
-            apiService.getResponse("VfQKOIY-Wh-aR2ltnl", "a=new_session")
-                .enqueue(object : Callback<Example> {
-                    override fun onResponse(call: Call<Example>, response: Response<Example>) {
-                        Log.d("TAG1", "onResponse: $response")
-                    }
 
-                    override fun onFailure(call: Call<Example>, t: Throwable) {
-                        Log.d("TAG1", "onFailure: $t")
-                    }
+             retrofit = Retrofit.Builder()
+            .baseUrl("https://bnet.i-partner.ru/")
+            .client(builder.build())
+            .client(getUnsafeOkHttpClient())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-                })
+        val apiService = retrofit.create(ApiService::class.java)
+        apiService.getResponse(
+            MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("a", "new_session")
+                .build()
+        )
+            .enqueue(object : Callback<Datum> {
+                override fun onResponse(call: Call<Datum>, response: Response<Datum>) {
+                    Log.d("TAG1", "onResponse: ${response}")
+                }
+
+                override fun onFailure(call: Call<Datum>, t: Throwable) {
+                    Log.d("TAG1", "onFailure: $t")
+                }
+
+            })
 
     }
+
+
 }
