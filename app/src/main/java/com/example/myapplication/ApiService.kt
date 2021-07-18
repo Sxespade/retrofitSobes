@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -16,7 +17,7 @@ interface ApiService {
 
     @POST("testAPI/")
     fun postMessage(
-        @Body requestBody: RequestBody
-    ): Call<Datum>
+        @Body datum: Datum
+    ): Call<ResponseBody>
 
 }

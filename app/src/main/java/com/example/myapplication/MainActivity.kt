@@ -9,6 +9,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -58,16 +59,19 @@ class MainActivity() : AppCompatActivity() {
             .addFormDataPart("body","dsdsdsdsddsdds")
             .build()
 
+        var datum = Datum()
+        datum.body = "efefefefefef"
+
         val apiService = retrofit.create(ApiService::class.java)
         apiService.postMessage(
-            requestBody
+            datum
         )
-            .enqueue(object : Callback<Datum> {
-                override fun onResponse(call: Call<Datum>, response: Response<Datum>) {
-                    Log.d("TAG1", "onResponse: ${response.body()}")
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    Log.d("TAG1", "onResponse: ${response}")
                 }
 
-                override fun onFailure(call: Call<Datum>, t: Throwable) {
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     Log.d("TAG1", "onFailure: $t")
                 }
 
