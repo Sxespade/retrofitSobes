@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_recents"
+        android:id="@+id/action_conclusion"
         android:enabled="true"
         android:title="Вывод" />
 
     <item
-        android:id="@+id/action_favorites"
+        android:id="@+id/action_create"
         android:enabled="true"
         android:title="Создание" />
 
