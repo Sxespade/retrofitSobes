@@ -13,7 +13,7 @@
         android:title="Создание" />
 
     <item
-        android:id="@+id/action_nearby"
+        android:id="@+id/action_read"
         android:enabled="true"
         android:title="Просмотр" />
 </menu>

@@ -23,7 +23,6 @@ class CreateViewModel(private val retrofitImplementation: RetrofitImplementation
 
     fun initRetrofit(str: String) {
         viewModelCoroutineScope.launch {
-            getResponseRetrofit()
             delay(500)
             retrofitPostMessage(str)
         }
@@ -33,7 +32,7 @@ class CreateViewModel(private val retrofitImplementation: RetrofitImplementation
         val requestBody: RequestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("a", "add_entry")
-            .addFormDataPart("session", session)
+            .addFormDataPart("session", Singleton.getSession().toString())
             .addFormDataPart("body", str)
             .build()
 
@@ -57,26 +56,26 @@ class CreateViewModel(private val retrofitImplementation: RetrofitImplementation
     }
 
 
-    private fun getResponseRetrofit() {
-        retrofitImplementation.initRetorfit().getResponse(
-            MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("a", "new_session")
-                .build()
-        )
-            .enqueue(object : Callback<Example> {
-                override fun onResponse(call: Call<Example>, response: Response<Example>) {
-                    Log.d("TAG2", "onResponse: ${response.body()?.data?.session}")
-                    session = response.body()?.data?.session.toString()
-                    Singleton.setSession(session)
-                }
-
-                override fun onFailure(call: Call<Example>, t: Throwable) {
-                    Log.d("TAG2", "onFailure: $t")
-                }
-
-            })
-    }
+//    private fun getResponseRetrofit() {
+//        retrofitImplementation.initRetorfit().getResponse(
+//            MultipartBody.Builder()
+//                .setType(MultipartBody.FORM)
+//                .addFormDataPart("a", "new_session")
+//                .build()
+//        )
+//            .enqueue(object : Callback<Example> {
+//                override fun onResponse(call: Call<Example>, response: Response<Example>) {
+//                    Log.d("TAG2", "onResponse: ${response.body()?.data?.session}")
+//                    session = response.body()?.data?.session.toString()
+//                    Singleton.setSession(session)
+//                }
+//
+//                override fun onFailure(call: Call<Example>, t: Throwable) {
+//                    Log.d("TAG2", "onFailure: $t")
+//                }
+//
+//            })
+//    }
 
 
     override fun errorReturned(t: Throwable) {

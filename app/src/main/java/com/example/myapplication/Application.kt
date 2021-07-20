@@ -38,91 +38,94 @@ class Application : Application() {
                 )
             )
         }
-        if (Singleton.getSession()==null) {
-        getResponseRetrofit()}
+
+        Singleton.setSession("hVfXK6QP2i1VIkGKUB")
+
+//        if (Singleton.getSession()==null) {
+//        getResponseRetrofit()}
     }
 
-    private fun getUnsafeOkHttpClient(): OkHttpClient? {
-        return try {
-            val trustAllCerts = arrayOf<TrustManager>(
-                object : X509TrustManager {
-                    @Throws(CertificateException::class)
-                    override fun checkClientTrusted(
-                        chain: Array<X509Certificate?>?,
-                        authType: String?
-                    ) {
-                    }
-
-                    @Throws(CertificateException::class)
-                    override fun checkServerTrusted(
-                        chain: Array<X509Certificate?>?,
-                        authType: String?
-                    ) {
-                    }
-
-                    override fun getAcceptedIssuers(): Array<X509Certificate?>? {
-                        return arrayOf()
-                    }
-                }
-            )
-
-            val sslContext = SSLContext.getInstance("SSL")
-            sslContext.init(null, trustAllCerts, SecureRandom())
-            val sslSocketFactory = sslContext.socketFactory
-            val trustManagerFactory: TrustManagerFactory =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-            trustManagerFactory.init(null as KeyStore?)
-            val trustManagers: Array<TrustManager> =
-                trustManagerFactory.trustManagers
-            check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
-                "Unexpected default trust managers:" + trustManagers.contentToString()
-            }
-
-            val trustManager =
-                trustManagers[0] as X509TrustManager
-
-
-            val builder = OkHttpClient.Builder()
-            builder.sslSocketFactory(sslSocketFactory, trustManager)
-            builder.hostnameVerifier(HostnameVerifier { _, _ -> true })
-            builder.build()
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
-    }
-
-    fun initRetorfit(): ApiService {
-        val builder = OkHttpClient.Builder()
-        builder.build()
-
-        return Retrofit.Builder()
-            .baseUrl("https://bnet.i-partner.ru/")
-            .client(OkHttpClient.Builder().build())
-            .client(getUnsafeOkHttpClient())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiService::class.java)
-
-    }
-
-    private fun getResponseRetrofit() {
-        initRetorfit().getResponse(
-            MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("a", "new_session")
-                .build()
-        )
-            .enqueue(object : Callback<Example> {
-                override fun onResponse(call: Call<Example>, response: Response<Example>) {
-                    Log.d("TAG2", "onResponse: ${response.body()?.data?.session}")
-                    var session = response.body()?.data?.session.toString()
-                    Singleton.setSession(session)
-                }
-
-                override fun onFailure(call: Call<Example>, t: Throwable) {
-                    Log.d("TAG2", "onFailure: $t")
-                }
-
-            })
-    }
+//    private fun getUnsafeOkHttpClient(): OkHttpClient? {
+//        return try {
+//            val trustAllCerts = arrayOf<TrustManager>(
+//                object : X509TrustManager {
+//                    @Throws(CertificateException::class)
+//                    override fun checkClientTrusted(
+//                        chain: Array<X509Certificate?>?,
+//                        authType: String?
+//                    ) {
+//                    }
+//
+//                    @Throws(CertificateException::class)
+//                    override fun checkServerTrusted(
+//                        chain: Array<X509Certificate?>?,
+//                        authType: String?
+//                    ) {
+//                    }
+//
+//                    override fun getAcceptedIssuers(): Array<X509Certificate?>? {
+//                        return arrayOf()
+//                    }
+//                }
+//            )
+//
+//            val sslContext = SSLContext.getInstance("SSL")
+//            sslContext.init(null, trustAllCerts, SecureRandom())
+//            val sslSocketFactory = sslContext.socketFactory
+//            val trustManagerFactory: TrustManagerFactory =
+//                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+//            trustManagerFactory.init(null as KeyStore?)
+//            val trustManagers: Array<TrustManager> =
+//                trustManagerFactory.trustManagers
+//            check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
+//                "Unexpected default trust managers:" + trustManagers.contentToString()
+//            }
+//
+//            val trustManager =
+//                trustManagers[0] as X509TrustManager
+//
+//
+//            val builder = OkHttpClient.Builder()
+//            builder.sslSocketFactory(sslSocketFactory, trustManager)
+//            builder.hostnameVerifier(HostnameVerifier { _, _ -> true })
+//            builder.build()
+//        } catch (e: Exception) {
+//            throw RuntimeException(e)
+//        }
+//    }
+//
+//    fun initRetorfit(): ApiService {
+//        val builder = OkHttpClient.Builder()
+//        builder.build()
+//
+//        return Retrofit.Builder()
+//            .baseUrl("https://bnet.i-partner.ru/")
+//            .client(OkHttpClient.Builder().build())
+//            .client(getUnsafeOkHttpClient())
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+//            .create(ApiService::class.java)
+//
+//    }
+//
+//    private fun getResponseRetrofit() {
+//        initRetorfit().getResponse(
+//            MultipartBody.Builder()
+//                .setType(MultipartBody.FORM)
+//                .addFormDataPart("a", "new_session")
+//                .build()
+//        )
+//            .enqueue(object : Callback<Example> {
+//                override fun onResponse(call: Call<Example>, response: Response<Example>) {
+//                    Log.d("TAG2", "onResponse: ${response.body()?.data?.session}")
+//                    var session = response.body()?.data?.session.toString()
+//                    Singleton.setSession(session)
+//                }
+//
+//                override fun onFailure(call: Call<Example>, t: Throwable) {
+//                    Log.d("TAG2", "onFailure: $t")
+//                }
+//
+//            })
+//    }
 }
